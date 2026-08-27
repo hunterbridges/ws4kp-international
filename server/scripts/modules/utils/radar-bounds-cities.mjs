@@ -16,16 +16,17 @@ export default class RadarBoundsCities {
 		const queryLimit = 50;
 
 		const query = `
-			SELECT ?item ?itemLabel ?coord ?population WHERE {
-				?item wdt:P31 wd:Q515 .
+			SELECT DISTINCT ?item ?itemLabel ?location ?population WHERE {
+				?item wdt:P31/wdt:P279* wd:Q515 .
 				?item wdt:P1082 ?population .
 				FILTER(?population > 50000)
-				?item wdt:P625 ?coord .
+
 				SERVICE wikibase:box {
 					?item wdt:P625 ?location .
 					bd:serviceParam wikibase:cornerWest "${pointCornerWest}"^^geo:wktLiteral .
 					bd:serviceParam wikibase:cornerEast "${pointCornerEast}"^^geo:wktLiteral .
 				}
+
 				SERVICE wikibase:label {
 					bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .
 				}
@@ -74,16 +75,18 @@ export default class RadarBoundsCities {
 							cityObject.city = item.itemLabel.value;
 						}
 
-						if (item.coord && item.coord.value) {
-							// Wikidata coordinates are in the format "Point(longitude latitude)"
-							// ex. "Point(10.738888888 59.913333333)"
-							const wikidataCoords = item.coord.value.replace('Point(', '').replace(')', '').split(' ');
+						if (item.location && item.location.value) {
+							const wikidataCoords = item.location.value
+								.replace('Point(', '')
+								.replace(')', '')
+								.split(' ');
+
 							const [lon, lat] = wikidataCoords;
 							cityObject.lat = lat;
 							cityObject.lon = lon;
 						}
 
-						// Wikedata API can return duplicate results with different pop objects,
+						// Wikidata API can return duplicate results with different pop objects,
 						// and we don't care about different pop values. So we discard duplicates
 						if (cityObject.city && !cityNameContainer.includes(cityObject.city)) {
 							cityNameContainer.push(cityObject.city);
