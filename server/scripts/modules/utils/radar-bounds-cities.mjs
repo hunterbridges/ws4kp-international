@@ -13,7 +13,7 @@ export default class RadarBoundsCities {
 
 		const pointCornerWest = `Point(${cornerWestLng} ${cornerWestLat})`;
 		const pointCornerEast = `Point(${cornerEastLng} ${cornerEastLat})`;
-		const queryLimit = 50;
+		const queryLimit = 35;
 
 		const query = `
 			SELECT DISTINCT ?item ?itemLabel ?location ?population WHERE {
@@ -124,10 +124,6 @@ export default class RadarBoundsCities {
 
 					if (!tooCloseToSelected) {
 						selected.push(city);
-					}
-
-					if (selected.length >= limit) {
-						break;
 					}
 				}
 

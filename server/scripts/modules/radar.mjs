@@ -20,7 +20,7 @@ class Radar extends WeatherDisplay {
 
 	static tileSource = 'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}';
 
-	static defaultCityDistance = 30; 				// 30 km
+	static defaultCityDistance = 20; 				// 20 km
 
 	static additionalLocationBufferDistance = 10; 	// 10 km
 
@@ -386,12 +386,12 @@ class Radar extends WeatherDisplay {
 			});
 
 			// Do this so the map isn't cluttered around origin location
-			// const filteredCities = cities.filter((city) => {
-			// 	const distance = haversineDistance(this.weatherParameters.latitude, this.weatherParameters.longitude, parseFloat(city.lat), parseFloat(city.lon));
-			// 	return distance >= Radar.defaultCityDistance + Radar.additionalLocationBufferDistance;	// distance away from the main city
-			// });
+			const filteredCities = cities.filter((city) => {
+				const distance = haversineDistance(this.weatherParameters.latitude, this.weatherParameters.longitude, parseFloat(city.lat), parseFloat(city.lon));
+				return distance >= Radar.defaultCityDistance + Radar.additionalLocationBufferDistance;	// distance away from the main city
+			});
 
-			const filteredCities = cities;
+			//const filteredCities = cities;
 
 			filteredCities.forEach(async (cityData) => {
 				// Check if this city is not the main city and not within 30km of any other city in filteredCities
