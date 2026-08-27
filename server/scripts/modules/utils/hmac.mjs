@@ -9,11 +9,28 @@ async function simpleHash(message) {
 	return hashHex.slice(0, 16);
 }
 
+function randomUUID() {
+	const bytes = new Uint8Array(16);
+	crypto.getRandomValues(bytes);
+
+	bytes[6] = (bytes[6] & 0x0f) | 0x40;
+	bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+	return [...bytes]
+		.map((b, i) => {
+			const s = b.toString(16).padStart(2, '0');
+			return [4, 6, 8, 10].includes(i) ? `-${s}` : s;
+		})
+		.join('');
+}
+
 // This is not secure as the client knows the "secret."
 // This is just a lightweight consistency check between client and proxy.
 async function createToken() {
-	const uuid = crypto.randomUUID();
+	const uuid = randomUUID();
+
 	const signature = await simpleHash(uuid);
+
 	return `${uuid}.${signature}`;
 }
 
