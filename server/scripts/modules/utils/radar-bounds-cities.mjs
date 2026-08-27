@@ -13,18 +13,23 @@ export default class RadarBoundsCities {
 		const limit = 7;
 
 		const query = `
-			SELECT ?item ?itemLabel ?coord ?population WHERE {
-			?item wdt:P31 wd:Q515 .
-			?item wdt:P1082 ?population .
-			FILTER(?population > 50000)
-			?item wdt:P625 ?coord .
-			SERVICE wikibase:box {
-				?item wdt:P625 ?location .
-				bd:serviceParam wikibase:cornerWest "${pointCornerWest}"^^geo:wktLiteral .
-				bd:serviceParam wikibase:cornerEast "${pointCornerEast}"^^geo:wktLiteral .
+			SELECT ?item ?itemLabel (SAMPLE(?coord) AS ?coord) (MAX(?population) AS ?population) WHERE {
+				?item wdt:P31 wd:Q515 .
+				?item wdt:P1082 ?population .
+				FILTER(?population > 50000)
+				?item wdt:P625 ?coord .
+
+				SERVICE wikibase:box {
+					?item wdt:P625 ?location .
+					bd:serviceParam wikibase:cornerWest "${pointCornerWest}"^^geo:wktLiteral .
+					bd:serviceParam wikibase:cornerEast "${pointCornerEast}"^^geo:wktLiteral .
+				}
+
+				SERVICE wikibase:label {
+					bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .
+				}
 			}
-			SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .  }
-			}
+			GROUP BY ?item ?itemLabel
 			ORDER BY DESC(?population)
 			LIMIT ${limit}
 		`
