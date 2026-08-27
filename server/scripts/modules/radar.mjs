@@ -380,7 +380,7 @@ class Radar extends WeatherDisplay {
 			const sw = bounds.getSouthWest();
 			const ne = bounds.getNorthEast();
 
-			const cities = await RadarBoundsCities.getBoundingBoxCities(sw.lng, sw.lat, ne.lng, ne.lat).catch((error) => {
+			const cities = await RadarBoundsCities.getBoundingBoxCities(sw.lat, sw.lng, ne.lat, ne.lng).catch((error) => {
 				console.error('Error fetching bounding box cities:', error);
 				return [];
 			});
