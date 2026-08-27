@@ -57,6 +57,32 @@ const index = (req, res) => {
 	});
 };
 
+app.get('/wikidata', async (req, res) => {
+	try {
+		const targetUrl = req.query.url;
+
+		if (!targetUrl?.startsWith('https://query.wikidata.org/')) {
+			res.status(400).json({ error: 'Invalid target URL' });
+			return;
+		}
+
+		const response = await fetch(targetUrl, {
+			headers: {
+				Accept: 'application/sparql-results+json',
+				'User-Agent': 'ws4kp-international/1.0',
+			},
+		});
+
+		res.status(response.status);
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		res.setHeader('Content-Type', response.headers.get('content-type') ?? 'application/json');
+		res.send(await response.text());
+	} catch (error) {
+		console.error('Wikidata proxy error:', error);
+		res.status(502).json({ error: 'Wikidata proxy request failed' });
+	}
+});
+
 // debugging
 if (process.env?.DIST === '1') {
 	// distribution

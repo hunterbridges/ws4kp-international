@@ -1,7 +1,7 @@
 import createToken from './hmac.mjs';
 
 const corsAnywhereKnownSources = [
-	'https://ws4kp-proxy.easypete.com/',
+	'/wikidata',
 ];
 
 export default class RadarBoundsCities {
@@ -48,7 +48,16 @@ export default class RadarBoundsCities {
 		});
 
 		const corsAnywhere = corsAnywhereKnownSources[Math.floor(Math.random() * corsAnywhereKnownSources.length)];
-		return fetch(corsAnywhere + RadarBoundsCities.internalConstructBoundingBoxQuery(cornerWestLat, cornerWestLng, cornerEastLat, cornerEastLng), { headers: defaultHeaders })
+		const wikidataUrl = RadarBoundsCities.internalConstructBoundingBoxQuery(
+			cornerWestLat,
+			cornerWestLng,
+			cornerEastLat,
+			cornerEastLng,
+		);
+
+		const proxiedUrl = `${corsAnywhere}?url=${encodeURIComponent(wikidataUrl)}`;
+
+		return fetch(proxiedUrl, { headers: defaultHeaders })
 			.then((res) => res.json())
 			.then((sparqlData) => {
 				const results = sparqlData.results && sparqlData.results.bindings;
