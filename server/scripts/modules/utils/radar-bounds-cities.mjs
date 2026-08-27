@@ -1,4 +1,5 @@
 import createToken from './hmac.mjs';
+import { haversineDistance } from './calc.mjs';
 
 const corsAnywhereKnownSources = [
 	'/wikidata',
@@ -12,7 +13,7 @@ export default class RadarBoundsCities {
 
 		const pointCornerWest = `Point(${cornerWestLng} ${cornerWestLat})`;
 		const pointCornerEast = `Point(${cornerEastLng} ${cornerEastLat})`;
-		const queryLimit = limit * 5;
+		const queryLimit = 50;
 
 		const query = `
 			SELECT ?item ?itemLabel ?coord ?population WHERE {
@@ -38,7 +39,7 @@ export default class RadarBoundsCities {
 		return baseUrl + encodeURIComponent(query);
 	}
 
-	static async getBoundingBoxCities(cornerWestLat, cornerWestLng, cornerEastLat, cornerEastLng) {
+	static async getBoundingBoxCities(primaryLat, primaryLon, cornerWestLat, cornerWestLng, cornerEastLat, cornerEastLng, minimumPrimaryDistance, minimumCitySpacing) {
 		const finalResult = new Set();
 
 		const defaultHeaders = new Headers({
@@ -91,7 +92,43 @@ export default class RadarBoundsCities {
 					});
 				}
 
-				return Array.from(finalResult).slice(0, limit);
+				const candidates = Array.from(finalResult);
+
+				const selected = [];
+
+				for (const city of candidates) {
+					const distanceFromPrimary = haversineDistance(
+						primaryLat,
+						primaryLon,
+						parseFloat(city.lat),
+						parseFloat(city.lon),
+					);
+
+					if (distanceFromPrimary < minimumPrimaryDistance) {
+						continue;
+					}
+
+					const tooCloseToSelected = selected.some((selectedCity) => {
+						const distance = haversineDistance(
+							parseFloat(selectedCity.lat),
+							parseFloat(selectedCity.lon),
+							parseFloat(city.lat),
+							parseFloat(city.lon),
+						);
+
+						return distance < minimumCitySpacing;
+					});
+
+					if (!tooCloseToSelected) {
+						selected.push(city);
+					}
+
+					if (selected.length >= limit) {
+						break;
+					}
+				}
+
+				return Array.from(selected);
 			});
 	}
 

@@ -20,7 +20,7 @@ class Radar extends WeatherDisplay {
 
 	static tileSource = 'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}';
 
-	static defaultCityDistance = 40; 				// 40 km
+	static defaultCityDistance = 20; 				// 20 km
 
 	static additionalLocationBufferDistance = 10; 	// 10 km
 
@@ -112,7 +112,7 @@ class Radar extends WeatherDisplay {
 	}
 
 	addLocationMarker(latitude, longitude, cityName, weatherData = null) {
-	// Remove existing marker if it exists
+		// Remove existing marker if it exists
 		if (this.locationMarker && window._leafletMap) {
 			window._leafletMap.removeLayer(this.locationMarker);
 		}
@@ -252,7 +252,7 @@ class Radar extends WeatherDisplay {
 	}
 
 	changeRadarPosition(position, preloadOnly = false, force = false) {
-	// Wrap position to valid range
+		// Wrap position to valid range
 		while (position >= this.mapFrames.length) {
 			position -= this.mapFrames.length;
 		}
@@ -278,7 +278,7 @@ class Radar extends WeatherDisplay {
 
 		// Don't wait for tiles if forced, or if we're not currently loading
 		if (!force && this.isTilesLoading()) {
-		// Set a timeout to try again
+			// Set a timeout to try again
 			setTimeout(() => {
 				this.changeRadarPosition(position, false, true);
 			}, 100);
@@ -380,16 +380,18 @@ class Radar extends WeatherDisplay {
 			const sw = bounds.getSouthWest();
 			const ne = bounds.getNorthEast();
 
-			const cities = await RadarBoundsCities.getBoundingBoxCities(sw.lat, sw.lng, ne.lat, ne.lng).catch((error) => {
+			const cities = await RadarBoundsCities.getBoundingBoxCities(this.weatherParameters.latitude, this.weatherParameters.longitude, sw.lat, sw.lng, ne.lat, ne.lng, this.defaultCityDistance, this.additionalLocationBufferDistance).catch((error) => {
 				console.error('Error fetching bounding box cities:', error);
 				return [];
 			});
 
 			// Do this so the map isn't cluttered around origin location
-			const filteredCities = cities.filter((city) => {
-				const distance = haversineDistance(this.weatherParameters.latitude, this.weatherParameters.longitude, parseFloat(city.lat), parseFloat(city.lon));
-				return distance >= Radar.defaultCityDistance + Radar.additionalLocationBufferDistance;	// distance away from the main city
-			});
+			// const filteredCities = cities.filter((city) => {
+			// 	const distance = haversineDistance(this.weatherParameters.latitude, this.weatherParameters.longitude, parseFloat(city.lat), parseFloat(city.lon));
+			// 	return distance >= Radar.defaultCityDistance + Radar.additionalLocationBufferDistance;	// distance away from the main city
+			// });
+
+			const filteredCities = cities;
 
 			filteredCities.forEach(async (cityData) => {
 				// Check if this city is not the main city and not within 30km of any other city in filteredCities
