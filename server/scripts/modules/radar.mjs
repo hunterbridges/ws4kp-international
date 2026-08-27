@@ -20,9 +20,9 @@ class Radar extends WeatherDisplay {
 
 	static tileSource = 'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}';
 
-	static defaultCityDistance = 20; 				// 20 km
+	static defaultCityDistance = 40; 				// 40 km
 
-	static additionalLocationBufferDistance = 10; 	// 10 km
+	static additionalLocationBufferDistance = 60; 	// 60 km
 
 	static radarIterationCount = 3;
 
@@ -388,7 +388,7 @@ class Radar extends WeatherDisplay {
 			// Do this so the map isn't cluttered around origin location
 			const filteredCities = cities.filter((city) => {
 				const distance = haversineDistance(this.weatherParameters.latitude, this.weatherParameters.longitude, parseFloat(city.lat), parseFloat(city.lon));
-				return distance >= Radar.defaultCityDistance + Radar.additionalLocationBufferDistance;	// distance away from the main city
+				return distance >= Radar.defaultCityDistance;	// distance away from the main city
 			});
 
 			//const filteredCities = cities;
