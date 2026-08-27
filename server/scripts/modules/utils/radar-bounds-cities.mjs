@@ -8,8 +8,8 @@ export default class RadarBoundsCities {
 	static internalConstructBoundingBoxQuery(cornerWestLat, cornerWestLng, cornerEastLat, cornerEastLng) {
 		const baseUrl = 'https://query.wikidata.org/sparql?query=';
 
-		const pointCornerWest = `Point(${cornerWestLat} ${cornerWestLng})`;
-		const pointCornerEast = `Point(${cornerEastLat} ${cornerEastLng})`;
+		const pointCornerWest = `Point(${cornerWestLng} ${cornerWestLat})`;
+		const pointCornerEast = `Point(${cornerEastLng} ${cornerEastLat})`;
 		const limit = 7;
 
 		const query = `
