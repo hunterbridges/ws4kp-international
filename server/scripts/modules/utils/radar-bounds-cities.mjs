@@ -13,24 +13,22 @@ export default class RadarBoundsCities {
 		const limit = 7;
 
 		const query = `
-            SELECT ?item ?itemLabel ?coord ?population WHERE {
-            ?item wdt:P31 wd:Q515 .                 # Instance of city
-            ?item wdt:P1082 ?population .           # Population
-            FILTER(?population > 50000)             # Filter for cities with population greater than 50,000
-            ?item wdt:P625 ?coord .                 # Coordinates of the city
-            
-            SERVICE wikibase:box {
-                ?item wdt:P625 ?location .
-                bd:serviceParam wikibase:cornerWest "${pointCornerWest}"^^geo:wktLiteral .
-                bd:serviceParam wikibase:cornerEast "${pointCornerEast}"^^geo:wktLiteral .
-            }
-
-            SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-            }
-            ORDER BY DESC(?population)
-            LIMIT ${limit}
-        `
-			.replace(/\s+/g, ' ') // ← collapse whitespace safely
+			SELECT ?item ?itemLabel ?coord ?population WHERE {
+			?item wdt:P31 wd:Q515 .
+			?item wdt:P1082 ?population .
+			FILTER(?population > 50000)
+			?item wdt:P625 ?coord .
+			SERVICE wikibase:box {
+				?item wdt:P625 ?location .
+				bd:serviceParam wikibase:cornerWest "${pointCornerWest}"^^geo:wktLiteral .
+				bd:serviceParam wikibase:cornerEast "${pointCornerEast}"^^geo:wktLiteral .
+			}
+			SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .  }
+			}
+			ORDER BY DESC(?population)
+			LIMIT ${limit}
+		`
+			.replace(/\s+/g, ' ')
 			.trim();
 
 		return baseUrl + encodeURIComponent(query);
