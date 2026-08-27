@@ -20,7 +20,7 @@ class Radar extends WeatherDisplay {
 
 	static tileSource = 'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}';
 
-	static defaultCityDistance = 20; 				// 20 km
+	static defaultCityDistance = 30; 				// 30 km
 
 	static additionalLocationBufferDistance = 10; 	// 10 km
 
