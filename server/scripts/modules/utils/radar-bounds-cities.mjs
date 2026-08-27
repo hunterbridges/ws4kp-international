@@ -4,34 +4,33 @@ const corsAnywhereKnownSources = [
 	'/wikidata',
 ];
 
+const limit = 7;
+
 export default class RadarBoundsCities {
 	static internalConstructBoundingBoxQuery(cornerWestLat, cornerWestLng, cornerEastLat, cornerEastLng) {
 		const baseUrl = 'https://query.wikidata.org/sparql?query=';
 
 		const pointCornerWest = `Point(${cornerWestLng} ${cornerWestLat})`;
 		const pointCornerEast = `Point(${cornerEastLng} ${cornerEastLat})`;
-		const limit = 7;
+		const queryLimit = limit * 5;
 
 		const query = `
-			SELECT ?item ?itemLabel (SAMPLE(?coord) AS ?coord) (MAX(?population) AS ?population) WHERE {
+			SELECT ?item ?itemLabel ?coord ?population WHERE {
 				?item wdt:P31 wd:Q515 .
 				?item wdt:P1082 ?population .
 				FILTER(?population > 50000)
 				?item wdt:P625 ?coord .
-
 				SERVICE wikibase:box {
 					?item wdt:P625 ?location .
 					bd:serviceParam wikibase:cornerWest "${pointCornerWest}"^^geo:wktLiteral .
 					bd:serviceParam wikibase:cornerEast "${pointCornerEast}"^^geo:wktLiteral .
 				}
-
 				SERVICE wikibase:label {
 					bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .
 				}
 			}
-			GROUP BY ?item ?itemLabel
 			ORDER BY DESC(?population)
-			LIMIT ${limit}
+			LIMIT ${queryLimit}
 		`
 			.replace(/\s+/g, ' ')
 			.trim();
@@ -92,7 +91,7 @@ export default class RadarBoundsCities {
 					});
 				}
 
-				return Array.from(finalResult);
+				return Array.from(finalResult).slice(0, limit);
 			});
 	}
 
