@@ -27,7 +27,7 @@ const weatherParameters = {};
 
 // auto refresh
 const AUTO_REFRESH_INTERVAL_MS = 500;
-const AUTO_REFRESH_TIME_MS = 600_000; // 10 min.
+const AUTO_REFRESH_TIME_MS = 1_800_000; // 30 min.
 const CHK_AUTO_REFRESH_SELECTOR = '#chkAutoRefresh';
 let AutoRefreshIntervalId = null;
 let AutoRefreshCountMs = 0;
